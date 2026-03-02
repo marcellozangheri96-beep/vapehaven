@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VapeHaven — Premium E-Commerce</title>
+<meta name="description" content="VapeHaven - Premium vaping products with 19 meticulously crafted flavors. Free shipping across Australia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<!-- SHIPPING BANNER -->
+<div class="shipping-banner"><div class="shipping-marquee" id="shipMarquee"></div></div>
+
+<!-- AGE GATE -->
+<div class="age-gate" id="ageGate">
+  <img class="age-gate-logo" src="/images/logo-large.png" alt="VapeHaven">
+  <p>You must be of legal age in your jurisdiction to enter this site.</p>
+  <div class="age-gate-btns">
+    <button class="btn btn-primary" id="ageYes">I Am Of Legal Age</button>
+    <button class="btn btn-ghost" id="ageNo">Exit</button>
+  </div>
+</div>
+
+<!-- EXIT POPUP -->
+<div class="exit-popup-overlay" id="exitPopup">
+  <div class="exit-popup">
+    <div class="exit-popup-icon" data-icon="alertCircle" data-icon-size="40"></div>
+    <h3>Age Restriction</h3>
+    <p>You must be 18 years or older to access this website. Please come back when you meet the age requirement.</p>
+    <button class="btn btn-primary" id="exitPopupClose">Close</button>
+  </div>
+</div>
+
+<!-- LOADER -->
+<div id="loader" class="hide">
+  <img src="/images/logo-loader.png" alt="VapeHaven">
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- HEADER -->
+<header id="siteHeader">
+  <a class="header-logo" id="headerLogoBtn">
+    <img src="/images/logo-large.png" alt="VapeHaven">
+  </a>
+  <nav>
+    <a class="nav-link" href="#" id="navCollection">Collection</a>
+    <a class="nav-link" href="#" id="navAbout">About</a>
+    <a class="nav-link" href="#" id="navContact">Contact</a>
+    <div class="nav-bag" id="navBag">
+      <div class="nav-bag-icon" data-icon="bag" data-icon-size="20"></div>
+      <span class="nav-bag-count" style="display:none">0</span>
+      <span class="nav-bag-label">Cart</span>
+    </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+      <span data-icon="menu" data-icon-size="22"></span>
+    </button>
+  </nav>
+</header>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-header">
+    <img src="/images/logo-large.png" alt="VapeHaven" class="mobile-menu-logo">
+    <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Close menu">
+      <span data-icon="close" data-icon-size="22"></span>
+    </button>
+  </div>
+  <div class="mobile-menu-links">
+    <a href="#" class="mobile-nav-link" data-page="home">Collection</a>
+    <a href="#" class="mobile-nav-link" data-page="about">About</a>
+    <a href="#" class="mobile-nav-link" data-page="contact">Contact</a>
+  </div>
+</div>
+
+<!-- HOME PAGE -->
+<div class="page active" id="homePage">
+  <section class="hero">
+    <img class="hero-logo" src="/images/logo-hero.png" alt="VapeHaven">
+    <div class="hero-tagline">Premium Vaping, Elevated</div>
+    <h1>Your Flavor<br>Awaits</h1>
+    <div class="hero-sub">Discover 19 meticulously crafted flavors in two stunning finishes. Premium quality meets extraordinary taste.</div>
+    <div class="hero-cta">
+      <button class="btn btn-primary" id="heroExplore">
+        <span data-icon="arrowRight" data-icon-size="16"></span>
+        Explore Collection
+      </button>
+      <button class="btn btn-ghost" id="heroLearn">Learn More</button>
+    </div>
+    <div class="hero-scroll"><span>Scroll</span><div class="line"></div></div>
+  </section>
+
+  <div class="marquee-wrap"><div class="marquee" id="marquee"></div></div>
+
+  <div id="collection">
+    <div class="section-title-area">
+      <div class="section-label">Explore</div>
+      <div class="section-title">The Collection</div>
+    </div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+
+  <!-- LED DISPLAY SHOWCASE -->
+  <section class="display-showcase" id="displayShowcase">
+    <div class="display-hero">
+      <img src="/images/catalog/global-edition.jpg" alt="SWIX Mate — Black & Silver" class="display-hero-img" loading="lazy">
+      <div class="display-hero-overlay">
+        <div class="section-label">Innovation</div>
+        <h2 class="display-showcase-title">Smart LED Display</h2>
+        <p class="display-showcase-desc">Built-in LED shows battery &amp; eliquid levels in real time. No guessing &mdash; always know where you stand.</p>
+      </div>
+    </div>
+    <div class="display-features-row">
+      <div class="display-feat">
+        <span data-icon="battery" data-icon-size="24"></span>
+        <strong>Battery Level</strong>
+        <span>Real-time percentage</span>
+      </div>
+      <div class="display-feat">
+        <span data-icon="capacity" data-icon-size="24"></span>
+        <strong>Eliquid Level</strong>
+        <span>Know when to replace</span>
+      </div>
+      <div class="display-feat">
+        <span data-icon="display" data-icon-size="24"></span>
+        <strong>Streamline Design</strong>
+        <span>Luxury full-body aesthetic</span>
+      </div>
+    </div>
+    <div class="display-gallery">
+      <div class="display-gallery-item">
+        <img src="/images/catalog/display-closeup.jpg" alt="LED Display Close-up" class="display-gallery-img" loading="lazy">
+        <div class="display-gallery-caption">LED Display Close-Up</div>
+      </div>
+      <div class="display-gallery-item">
+        <img src="/images/catalog/special-edition-device.jpg" alt="Special Edition" class="display-gallery-img" loading="lazy">
+        <div class="display-gallery-caption">Special Edition</div>
+      </div>
+      <div class="display-gallery-item">
+        <img src="/images/catalog/three-devices.jpg" alt="Three Devices" class="display-gallery-img" loading="lazy">
+        <div class="display-gallery-caption">Luxury &amp; Unique</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUNDLE PACKAGES -->
+  <section class="bundle-section" id="bundleSection">
+    <div class="bundle-inner">
+      <div class="section-label">Save Big</div>
+      <h2 class="bundle-title">Flavor Bundle Packs</h2>
+      <p class="bundle-subtitle">Hand-picked themed collections &mdash; the ultimate way to explore the full SWIX Mate range at unbeatable prices.</p>
+
+      <div class="bundle-grid">
+        <!-- Bundle 1: Tropical Paradise -->
+        <div class="bundle-card" data-bundle-slug="tropical-paradise">
+          <div class="bundle-discount-sticker">42% OFF</div>
+          <div class="bundle-card-img">
+            <img src="/images/catalog/hero-devices.jpg" alt="Tropical Paradise Bundle" loading="lazy">
+          </div>
+          <div class="bundle-card-content">
+            <h3 class="bundle-card-title">Tropical Paradise</h3>
+            <p class="bundle-card-flavors">Mango Lime &middot; Mango Peach Watermelon &middot; Watermelon Coconut &middot; Kiwi Mulberry &middot; Apple Pear Watermelon</p>
+            <div class="bundle-pricing">
+              <span class="bundle-price-original">$345</span>
+              <span class="bundle-price-sale">$200</span>
+            </div>
+            <div class="bundle-color-picker">
+              <span class="bundle-color bundle-color-active" data-color="silver" title="Silver"></span>
+              <span class="bundle-color" data-color="black" title="Black"></span>
+            </div>
+            <button class="btn btn-primary bundle-cta" data-bundle="tropical">Add to Cart</button>
+          </div>
+        </div>
+
+        <!-- Bundle 2: Berry Blast -->
+        <div class="bundle-card" data-bundle-slug="berry-blast">
+          <div class="bundle-discount-sticker">42% OFF</div>
+          <div class="bundle-card-img">
+            <img src="/images/catalog/special-edition-device.jpg" alt="Berry Blast Bundle" loading="lazy">
+          </div>
+          <div class="bundle-card-content">
+            <h3 class="bundle-card-title">Berry Blast</h3>
+            <p class="bundle-card-flavors">Blueberry Blast &middot; Blueberry Bubblegum &middot; Black Cherry Pomegranate &middot; Strawberry Watermelon &middot; Cherry Pomegranate</p>
+            <div class="bundle-pricing">
+              <span class="bundle-price-original">$345</span>
+              <span class="bundle-price-sale">$200</span>
+            </div>
+            <div class="bundle-color-picker">
+              <span class="bundle-color bundle-color-active" data-color="silver" title="Silver"></span>
+              <span class="bundle-color" data-color="black" title="Black"></span>
+            </div>
+            <button class="btn btn-primary bundle-cta" data-bundle="berry">Add to Cart</button>
+          </div>
+        </div>
+
+        <!-- Bundle 3: Sweet Classics -->
+        <div class="bundle-card" data-bundle-slug="sweet-classics">
+          <div class="bundle-discount-sticker">42% OFF</div>
+          <div class="bundle-card-img">
+            <img src="/images/catalog/three-devices.jpg" alt="Sweet Classics Bundle" loading="lazy">
+          </div>
+          <div class="bundle-card-content">
+            <h3 class="bundle-card-title">Sweet Classics</h3>
+            <p class="bundle-card-flavors">Skittles &middot; Chupa Chups Grape &middot; Strawberry Candy &middot; Banana Smoothie &middot; Lemon Cola</p>
+            <div class="bundle-pricing">
+              <span class="bundle-price-original">$345</span>
+              <span class="bundle-price-sale">$200</span>
+            </div>
+            <div class="bundle-color-picker">
+              <span class="bundle-color bundle-color-active" data-color="silver" title="Silver"></span>
+              <span class="bundle-color" data-color="black" title="Black"></span>
+            </div>
+            <button class="btn btn-primary bundle-cta" data-bundle="sweet">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mystery Box -->
+      <div class="bundle-card bundle-card-mystery" data-bundle-slug="mystery-box">
+        <div class="bundle-discount-sticker bundle-sticker-mystery">45% OFF</div>
+        <div class="bundle-mystery-layout">
+          <div class="bundle-card-img bundle-mystery-img">
+            <img src="/images/catalog/global-edition.jpg" alt="Mystery Box" loading="lazy">
+          </div>
+          <div class="bundle-card-content">
+            <h3 class="bundle-card-title">Mystery Box</h3>
+            <p class="bundle-card-flavors">10 randomly selected flavors from our full range of 19 &mdash; let fate decide your favorites.</p>
+            <div class="bundle-pricing">
+              <span class="bundle-price-original">$690</span>
+              <span class="bundle-price-sale">$380</span>
+            </div>
+            <div class="bundle-color-picker">
+              <span class="bundle-color bundle-color-active" data-color="silver" title="Silver"></span>
+              <span class="bundle-color" data-color="black" title="Black"></span>
+            </div>
+            <button class="btn btn-primary bundle-cta" data-bundle="mystery">Add Mystery Box to Cart</button>
+            <div class="bundle-includes">
+              <span data-icon="truck" data-icon-size="14"></span> Free Shipping AU-Wide
+              <span class="bundle-sep">&bull;</span>
+              <span data-icon="package" data-icon-size="14"></span> 10 Devices
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="features-banner" id="featuresStrip">
+    <div class="features-inner">
+      <div class="feat">
+        <div class="feat-icon" data-icon="star" data-icon-size="28"></div>
+        <div class="feat-num">19</div>
+        <div class="feat-text">
+          <div class="feat-title">Unique Flavors</div>
+          <div class="feat-desc">From fruity to classic, your perfect match exists</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" data-icon="package" data-icon-size="28"></div>
+        <div class="feat-num">2</div>
+        <div class="feat-text">
+          <div class="feat-title">Premium Finishes</div>
+          <div class="feat-desc">Sleek Black or elegant Silver — your style</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" data-icon="puffs" data-icon-size="28"></div>
+        <div class="feat-num">9K</div>
+        <div class="feat-text">
+          <div class="feat-title">Puffs Per Device</div>
+          <div class="feat-desc">Long-lasting enjoyment, crafted to endure</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon" data-icon="truck" data-icon-size="28"></div>
+        <div class="feat-num">&#8734;</div>
+        <div class="feat-text">
+          <div class="feat-title">Free Shipping</div>
+          <div class="feat-desc">Complimentary delivery on every order, AU-wide</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <img class="footer-logo page-footer-logo" src="/images/logo-large.png" alt="VapeHaven">
+    <div class="footer-text">&#169; 2026 VapeHaven — All Rights Reserved</div>
+    <div class="footer-links">
+      <a href="#" class="go-privacy">Privacy Policy</a>
+      <a href="#" class="go-terms">Terms of Service</a>
+      <a href="#" class="go-contact">Contact</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://instagram.com" target="_blank" rel="noopener" title="Instagram">
+        <span data-icon="instagram" data-icon-size="16"></span>
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener" title="Facebook">
+        <span data-icon="facebook" data-icon-size="16"></span>
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- DETAIL PAGE -->
+<div class="page" id="detailPage">
+  <div class="product-detail" id="detailContent"></div>
+  <footer>
+    <img class="footer-logo page-footer-logo" src="/images/logo-large.png" alt="VapeHaven">
+    <div class="footer-text">&#169; 2026 VapeHaven — All Rights Reserved</div>
+    <div class="footer-links">
+      <a href="#" class="go-privacy">Privacy Policy</a>
+      <a href="#" class="go-terms">Terms of Service</a>
+      <a href="#" class="go-contact">Contact</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://instagram.com" target="_blank" rel="noopener" title="Instagram">
+        <span data-icon="instagram" data-icon-size="16"></span>
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener" title="Facebook">
+        <span data-icon="facebook" data-icon-size="16"></span>
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page" id="aboutPage">
+  <div class="about-hero">
+    <h1>About VapeHaven</h1>
+    <p>We believe in delivering an exceptional vaping experience through premium quality, carefully curated flavors, and a commitment to our community across Australia.</p>
+  </div>
+  <div class="about-values">
+    <div class="about-value">
+      <div class="about-value-icon" data-icon="star" data-icon-size="28"></div>
+      <h3>Premium Quality</h3>
+      <p>Every SWIX device is crafted with top-grade materials and rigorously tested to ensure a smooth, consistent draw from the first puff to the last.</p>
+    </div>
+    <div class="about-value">
+      <div class="about-value-icon" data-icon="filter" data-icon-size="28"></div>
+      <h3>Curated Selection</h3>
+      <p>Our 19 flavors are carefully selected and refined. We focus on perfecting every flavor profile in our collection.</p>
+    </div>
+    <div class="about-value">
+      <div class="about-value-icon" data-icon="truck" data-icon-size="28"></div>
+      <h3>Australia-Wide</h3>
+      <p>Free shipping on every order across Australia. Premium vaping accessible no matter where you are.</p>
+    </div>
+  </div>
+  <div style="text-align:center;padding:0 2.5rem 5rem">
+    <p style="color:var(--text-muted);font-size:0.88rem;max-width:550px;margin:0 auto;line-height:1.7;font-weight:300">
+      VapeHaven is proudly Australian-operated. For partnerships, wholesale inquiries, or just to say hello — we would love to hear from you.
+    </p>
+    <button class="btn btn-primary" style="margin-top:1.5rem" id="aboutContactBtn">Get In Touch</button>
+  </div>
+  <footer>
+    <img class="footer-logo page-footer-logo" src="/images/logo-large.png" alt="VapeHaven">
+    <div class="footer-text">&#169; 2026 VapeHaven — All Rights Reserved</div>
+    <div class="footer-links">
+      <a href="#" class="go-privacy">Privacy Policy</a>
+      <a href="#" class="go-terms">Terms of Service</a>
+      <a href="#" class="go-contact">Contact</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://instagram.com" target="_blank" rel="noopener" title="Instagram">
+        <span data-icon="instagram" data-icon-size="16"></span>
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener" title="Facebook">
+        <span data-icon="facebook" data-icon-size="16"></span>
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- CONTACT PAGE -->
+<div class="page" id="contactPage">
+  <div class="about-hero">
+    <h1>Contact Us</h1>
+    <p>Have a question, suggestion, or just want to connect? Reach out and we will get back to you as soon as possible.</p>
+  </div>
+  <div class="contact-cards">
+    <div class="contact-block">
+      <div class="contact-block-icon" data-icon="mail" data-icon-size="24"></div>
+      <h3>Email</h3>
+      <p>hello@vapehaven.com.au</p>
+    </div>
+    <div class="contact-block">
+      <div class="contact-block-icon" data-icon="clock" data-icon-size="24"></div>
+      <h3>Business Hours</h3>
+      <p>Monday – Friday: 9am – 5pm AEST<br>Saturday: 10am – 2pm AEST</p>
+    </div>
+    <div class="contact-block">
+      <div class="contact-block-icon" data-icon="heart" data-icon-size="24"></div>
+      <h3>Follow Us</h3>
+      <p>Stay up to date with new flavors, drops, and exclusive offers.</p>
+      <div class="footer-social" style="justify-content:flex-start;margin-top:0.8rem">
+        <a href="https://instagram.com" target="_blank" rel="noopener">
+          <span data-icon="instagram" data-icon-size="18"></span>
+        </a>
+        <a href="https://facebook.com" target="_blank" rel="noopener">
+          <span data-icon="facebook" data-icon-size="18"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <img class="footer-logo page-footer-logo" src="/images/logo-large.png" alt="VapeHaven">
+    <div class="footer-text">&#169; 2026 VapeHaven — All Rights Reserved</div>
+    <div class="footer-links">
+      <a href="#" class="go-privacy">Privacy Policy</a>
+      <a href="#" class="go-terms">Terms of Service</a>
+      <a href="#" class="go-contact">Contact</a>
+    </div>
+    <div class="footer-social">
+      <a href="https://instagram.com" target="_blank" rel="noopener" title="Instagram">
+        <span data-icon="instagram" data-icon-size="16"></span>
+      </a>
+      <a href="https://facebook.com" target="_blank" rel="noopener" title="Facebook">
+        <span data-icon="facebook" data-icon-size="16"></span>
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- CHECKOUT PAGE -->
+<div class="page" id="checkoutPage">
+  <div class="checkout-container">
+    <div class="checkout-header">
+      <a class="header-logo" id="checkoutLogo">
+        <img src="/images/logo-large.png" alt="VapeHaven">
+      </a>
+    </div>
+    <div id="checkoutContent"></div>
+  </div>
+</div>
+
+<!-- PRIVACY POLICY -->
+<div class="page" id="privacyPage">
+  <div class="static-page">
+    <button class="back-btn" id="privacyBack">
+      <span data-icon="arrowLeft" data-icon-size="16"></span> Back
+    </button>
+    <h1>Privacy Policy</h1>
+    <p class="page-updated">Last updated: 1 March 2026</p>
+    <h2>1. Information We Collect</h2>
+    <p>When you visit VapeHaven or make a purchase, we may collect the following types of information: personal identification information (name, email address, phone number, shipping address), payment information (processed securely through our third-party payment provider), device and browser information collected automatically through cookies, and browsing behaviour and interaction data on our website.</p>
+    <h2>2. How We Use Your Information</h2>
+    <p>We use the information we collect to process and fulfil your orders including shipping and delivery, to communicate with you about your orders and customer service enquiries, to improve our website and overall customer experience, to send promotional materials where you have opted in, and to comply with legal obligations and prevent fraudulent activity.</p>
+    <h2>3. Data Sharing</h2>
+    <p>We do not sell your personal information to third parties. We may share your data with trusted service providers who assist us in operating our business, including payment processors, shipping carriers, and analytics providers.</p>
+    <h2>4. Cookies</h2>
+    <p>Our website uses cookies to enhance your browsing experience, analyse site traffic, and personalise content. You can manage your cookie preferences through your browser settings.</p>
+    <h2>5. Data Security</h2>
+    <p>We implement industry-standard security measures to protect your personal information. All payment transactions are encrypted using SSL technology.</p>
+    <h2>6. Your Rights</h2>
+    <p>Under the Australian Privacy Act 1988, you have the right to access, correct, or request deletion of your personal information. Contact us at hello@vapehaven.com.au.</p>
+    <h2>7. Age Verification</h2>
+    <p>VapeHaven is intended for users of legal smoking age in their jurisdiction. We reserve the right to verify age at any point during the purchasing process.</p>
+    <h2>8. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated revision date.</p>
+    <div class="static-divider"></div>
+    <p>Questions? Contact us at hello@vapehaven.com.au.</p>
+  </div>
+  <footer>
+    <img class="footer-logo page-footer-logo" src="/images/logo-large.png" alt="VapeHaven">
+    <div class="footer-text">&#169; 2026 VapeHaven — All Rights Reserved</div>
+  </footer>
+</div>
+
+<!-- TERMS OF SERVICE -->
+<div class="page" id="termsPage">
+  <div class="static-page">
+    <button class="back-btn" id="termsBack">
+      <span data-icon="arrowLeft" data-icon-size="16"></span> Back
+    </button>
+    <h1>Terms of Service</h1>
+    <p class="page-updated">Last updated: 1 March 2026</p>
+    <h2>1. Acceptance of Terms</h2>
+    <p>By accessing and using the VapeHaven website, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
+    <h2>2. Age Requirement</h2>
+    <p>You must be of legal smoking age in your state or territory of residence to use this website and purchase products. VapeHaven reserves the right to cancel any order where age verification cannot be completed.</p>
+    <h2>3. Products and Pricing</h2>
+    <p>Prices are listed in Australian Dollars (AUD) and include GST where applicable. We reserve the right to modify prices at any time without prior notice.</p>
+    <h2>4. Orders and Payment</h2>
+    <p>By placing an order, you are making an offer to purchase. We reserve the right to accept or decline any order. Payment must be completed at the time of purchase.</p>
+    <h2>5. Shipping and Delivery</h2>
+    <p>VapeHaven offers free shipping on all orders within Australia. Estimated delivery times are provided as a guide and are not guaranteed.</p>
+    <h2>6. Returns and Refunds</h2>
+    <p>We are unable to accept returns on opened or used items. If you receive a defective or incorrect product, contact us within 7 days of delivery. Unopened items may be returned within 14 days of receipt.</p>
+    <h2>7. Intellectual Property</h2>
+    <p>All content on this website is the property of VapeHaven and is protected by Australian and international intellectual property laws.</p>
+    <h2>8. Limitation of Liability</h2>
+    <p>VapeHaven shall not be liable for any indirect, incidental, special, or consequential damages arising from the use of our products or website.</p>
+    <h2>9. Governing Law</h2>
+    <p>These Terms of Service are governed by the laws of Australia.</p>
+    <h2>10. Changes to Terms</h2>
+    <p>We reserve the right to update these Terms at any time. Continued use constitutes acceptance of the revised terms.</p>
+    <div class="static-divider"></div>
+    <p>Questions? Contact us at hello@vapehaven.com.au.</p>
+  </div>
+  <footer>
+    <img class="footer-logo page-footer-logo" src="/images/logo-large.png" alt="VapeHaven">
+    <div class="footer-text">&#169; 2026 VapeHaven — All Rights Reserved</div>
+  </footer>
+</div>
+
+<!-- TOAST -->
+<div id="toast">Coming soon</div>
+
+<!-- SCRIPTS -->
+<script src="/js/icons.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/cart.js"></script>
+<script src="/js/checkout.js"></script>
+
+</body>
+</html>
