@@ -2,7 +2,9 @@ const initSqlJs = require('sql.js');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, '..', 'vaperoo.db');
+const DB_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'vaperoo.db')
+  : path.join(__dirname, '..', 'vaperoo.db');
 let db = null;
 let dbReady = null;
 

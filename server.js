@@ -8,7 +8,9 @@ const path = require('path');
 const fs = require('fs');
 
 // ===== Logging Setup =====
-const LOG_PATH = path.join(__dirname, 'server.log');
+const LOG_PATH = process.env.VERCEL
+  ? path.join('/tmp', 'server.log')
+  : path.join(__dirname, 'server.log');
 
 function log(level, message, meta = {}) {
   const timestamp = new Date().toISOString();
@@ -161,14 +163,18 @@ async function startServer() {
 }
 
 let server;
-startServer()
-  .then((s) => {
-    server = s;
-  })
-  .catch((error) => {
-    log('FATAL', 'Failed to start server', { error: error.message, stack: error.stack });
-    process.exit(1);
-  });
+
+// Only start listening when run directly (not on Vercel serverless)
+if (!process.env.VERCEL) {
+  startServer()
+    .then((s) => {
+      server = s;
+    })
+    .catch((error) => {
+      log('FATAL', 'Failed to start server', { error: error.message, stack: error.stack });
+      process.exit(1);
+    });
+}
 
 // Graceful shutdown
 function shutdown(signal) {
