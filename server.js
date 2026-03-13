@@ -112,7 +112,7 @@ app.use('/api/payments', paymentLimiter, paymentsRouter);
 app.get('/health', (req, res) => {
   res.json({
     success: true,
-    message: 'VapeHaven API is running',
+    message: 'Vaperoo API is running',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
@@ -144,7 +144,7 @@ async function startServer() {
   await dbReady;
 
   const server = app.listen(PORT, '0.0.0.0', () => {
-    log('INFO', `VapeHaven API server listening on port ${PORT}`);
+    log('INFO', `Vaperoo API server listening on port ${PORT}`);
     log('INFO', `Environment: ${process.env.NODE_ENV || 'development'}`);
     log('INFO', `PID: ${process.pid}`);
   });

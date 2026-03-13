@@ -1,7 +1,7 @@
 {
-  "name": "vapehaven-backend",
+  "name": "vaperoo-backend",
   "version": "1.0.0",
-  "description": "VapeHaven e-commerce backend - Node.js + Express + SQLite",
+  "description": "Vaperoo e-commerce backend - Node.js + Express + SQLite",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

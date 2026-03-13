@@ -1,5 +1,5 @@
 /**
- * VapeHaven Cart Module
+ * Vaperoo Cart Module
  * Manages shopping cart state, backend API sync, and cart drawer UI
  */
 
@@ -197,7 +197,7 @@ const Cart = (function() {
             </div>
             <div class="cart-total-row cart-total-final">
               <span>Total</span>
-              <span class="cart-total">$0.00 AUD</span>
+              <span class="cart-total">$0.00</span>
             </div>
           </div>
           <button class="btn btn-primary cart-checkout-btn" style="width:100%">
@@ -338,7 +338,7 @@ const Cart = (function() {
     const subtotalEl = document.querySelector('.cart-subtotal');
     const totalEl = document.querySelector('.cart-total');
     if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-    if (totalEl) totalEl.textContent = `$${subtotal.toFixed(2)} AUD`;
+    if (totalEl) totalEl.textContent = `$${subtotal.toFixed(2)}`;
 
     // Attach event listeners for quantity controls and remove button
     container.querySelectorAll('[data-action]').forEach(btn => {

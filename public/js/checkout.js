@@ -206,7 +206,7 @@ const Checkout = (function() {
       <div class="review-totals">
         <div class="review-total-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
         <div class="review-total-row"><span>Shipping</span><span>Free</span></div>
-        <div class="review-total-row review-total-final"><span>Total</span><span>$${subtotal.toFixed(2)} AUD</span></div>
+        <div class="review-total-row review-total-final"><span>Total</span><span>$${subtotal.toFixed(2)}</span></div>
       </div>
 
       <div class="checkout-nav">
@@ -253,7 +253,7 @@ const Checkout = (function() {
       <div class="checkout-summary-totals">
         <div class="summary-total-row"><span>Subtotal (${itemCount} items)</span><span>$${subtotal.toFixed(2)}</span></div>
         <div class="summary-total-row"><span>Shipping</span><span>Free</span></div>
-        <div class="summary-total-row summary-total-final"><span>Total</span><span>$${subtotal.toFixed(2)} AUD</span></div>
+        <div class="summary-total-row summary-total-final"><span>Total</span><span>$${subtotal.toFixed(2)}</span></div>
       </div>
     </div>`;
   }
@@ -470,7 +470,7 @@ const Checkout = (function() {
             </div>
             <div class="confirmation-row">
               <span>Total Charged</span>
-              <span>$${result.order.total.toFixed(2)} AUD</span>
+              <span>$${result.order.total.toFixed(2)}</span>
             </div>
             <div class="confirmation-row">
               <span>Confirmation sent to</span>

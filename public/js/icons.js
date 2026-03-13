@@ -1,5 +1,5 @@
 /**
- * VapeHaven Icon Library
+ * Vaperoo Icon Library
  * A collection of SVG icons for the premium dark-themed vape e-commerce site
  * All icons use stroke-based design (1.5px) for consistency with the brand aesthetic
  */

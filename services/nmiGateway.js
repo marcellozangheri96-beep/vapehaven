@@ -224,7 +224,7 @@ async function processPayment(paymentDetails) {
         // Invoice info
         orderid: orderId || 'unknown',
         invoice_num: orderId || 'unknown',
-        product_description: `VapeHaven - ${productCategory}`,
+        product_description: `Vaperoo - ${productCategory}`,
         
         // Tax and shipping for Level 2 data
         tax: (amount * 0.1).toFixed(2), // Assume 10% tax

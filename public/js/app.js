@@ -1,4 +1,4 @@
-// ===== VapeHaven Main Application =====
+// ===== Vaperoo Main Application =====
 // Vanilla JS SPA – product browsing, filtering, cart & checkout
 
 // ===== API Helper =====
@@ -178,19 +178,19 @@ function renderGrid() {
     if (product.original_price && product.original_price > product.price) {
       const pctOff = Math.round((1 - product.price / product.original_price) * 100);
       discountBadge = `<span class="card-discount-badge">${pctOff}% OFF</span>`;
-      priceHTML = `<span class="card-price-original">AUD $${Number(product.original_price).toFixed(2)}</span>
-        <span class="card-price card-price-sale">AUD $${Number(product.price).toFixed(2)}</span>`;
+      priceHTML = `<span class="card-price-original">$${Number(product.original_price).toFixed(2)}</span>
+        <span class="card-price card-price-sale">$${Number(product.price).toFixed(2)}</span>`;
     } else {
-      priceHTML = `<span class="card-price">AUD $${Number(product.price).toFixed(2)}</span>`;
+      priceHTML = `<span class="card-price">$${Number(product.price).toFixed(2)}</span>`;
     }
 
     html += `
       <div class="product-card ${isTopSeller ? 'product-card-top-seller' : ''}" style="animation-delay:${i * 50}ms" data-slug="${product.slug}">
-        ${isTopSeller ? '<div class="top-seller-badge"><span class="top-seller-star">&#9733;</span> Top Seller</div>' : ''}
         ${discountBadge}
         <div class="card-glow" style="background:radial-gradient(circle,${color}22 0%,transparent 70%)"></div>
         <div class="card-img-wrap">
           <img src="${defaultImg}" alt="${product.name}" class="card-img" loading="lazy">
+          ${isTopSeller ? '<div class="top-seller-badge"><span class="top-seller-star">&#9733;</span> Top Seller</div>' : ''}
         </div>
         <div class="card-info">
           <span class="card-category" style="color:${color}">${categoryLabels[product.category] || product.category}</span>
@@ -246,19 +246,19 @@ function renderDetail() {
   const p = currentProduct;
   const color = categoryColors[p.category] || '#4D96FF';
   const catLabel = categoryLabels[p.category] || p.category;
-  const img = currentVariant === 'silver' ? p.image_silver : p.image_black;
+  const img = p.image_black || p.image_silver;
   const isTopSeller = TOP_SELLER_SLUGS.includes(p.slug) || p.is_top_seller;
 
+  // Show both color images side by side + random note
   let variantHTML = '';
-  if (p.image_black || p.image_silver) {
-    variantHTML = '<div class="variant-selector"><p class="variant-label">Color:</p><div class="variant-options">';
-    if (p.image_silver) {
-      variantHTML += `<button class="variant-btn ${currentVariant === 'silver' ? 'active' : ''}" data-variant="silver"><span class="dot silver"></span> Silver</button>`;
-    }
-    if (p.image_black) {
-      variantHTML += `<button class="variant-btn ${currentVariant === 'black' ? 'active' : ''}" data-variant="black"><span class="dot black"></span> Black</button>`;
-    }
-    variantHTML += '</div></div>';
+  if (p.image_black && p.image_silver) {
+    variantHTML = `<div class="variant-gallery">
+      <div class="variant-gallery-imgs">
+        <img src="${p.image_silver}" alt="${p.name} — Silver" class="variant-gallery-img">
+        <img src="${p.image_black}" alt="${p.name} — Black" class="variant-gallery-img">
+      </div>
+      <p class="color-random-note">Available in Silver &amp; Black — color is selected at random with each order.</p>
+    </div>`;
   }
 
   const specs = [
@@ -283,10 +283,10 @@ function renderDetail() {
   // Price in detail view — crossed-out original price for ALL products
   let detailPriceHTML;
   if (p.original_price && p.original_price > p.price) {
-    detailPriceHTML = `<span class="price-original">AUD $${Number(p.original_price).toFixed(2)}</span>
-      <span class="price price-sale">AUD $${Number(p.price).toFixed(2)}</span>`;
+    detailPriceHTML = `<span class="price-original">$${Number(p.original_price).toFixed(2)}</span>
+      <span class="price price-sale">$${Number(p.price).toFixed(2)}</span>`;
   } else {
-    detailPriceHTML = `<span class="price">AUD $${Number(p.price).toFixed(2)}</span>`;
+    detailPriceHTML = `<span class="price">$${Number(p.price).toFixed(2)}</span>`;
   }
 
   container.innerHTML = `
@@ -305,7 +305,7 @@ function renderDetail() {
           <p class="detail-description">${p.description}</p>
           <div class="detail-price">
             ${detailPriceHTML}
-            <span class="free-shipping">Free Shipping AU-Wide</span>
+            <span class="free-shipping">Free Shipping Worldwide</span>
           </div>
           ${variantHTML}
           ${specsHTML}
@@ -319,13 +319,10 @@ function renderDetail() {
   // Event listeners
   document.getElementById('backBtn').addEventListener('click', goHome);
 
-  container.querySelectorAll('.variant-btn').forEach(btn => {
-    btn.addEventListener('click', () => switchVariant(btn.dataset.variant));
-  });
-
   document.getElementById('addToCartBtn').addEventListener('click', () => {
     if (window.Cart) {
-      window.Cart.addItem(currentProduct.id, currentVariant, 1);
+      const randomColor = Math.random() < 0.5 ? 'silver' : 'black';
+      window.Cart.addItem(currentProduct.id, randomColor, 1);
     }
   });
 
@@ -333,22 +330,7 @@ function renderDetail() {
 }
 
 function switchVariant(variant) {
-  const newImg = variant === 'silver' ? currentProduct.image_silver : currentProduct.image_black;
-  if (!newImg) return;
-
-  const el = document.getElementById('detailImage');
-  if (el) {
-    el.style.opacity = '0';
-    setTimeout(() => {
-      el.src = newImg;
-      currentVariant = variant;
-      el.style.opacity = '1';
-    }, 150);
-  }
-
-  document.querySelectorAll('.variant-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.variant === variant);
-  });
+  // Deprecated — color is now random. Kept for compatibility.
 }
 
 // ===== Marquees =====
@@ -362,7 +344,7 @@ function initMarquee() {
 
   const shipMarquee = document.getElementById('shipMarquee');
   if (shipMarquee) {
-    const text = 'FREE SHIPPING ACROSS AUSTRALIA \u2022 PREMIUM QUALITY \u2022 9000 PUFFS \u2022 ';
+    const text = 'FREE SHIPPING WORLDWIDE \u2022 PREMIUM QUALITY \u2022 9000 PUFFS \u2022';
     shipMarquee.innerHTML = `<div class="shipping-marquee-content"><span>${text}</span><span>${text}</span><span>${text}</span></div>`;
   }
 }
@@ -529,16 +511,6 @@ const BUNDLES = {
 };
 
 function initBundles() {
-  // Color picker
-  document.querySelectorAll('.bundle-color').forEach(dot => {
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const picker = dot.closest('.bundle-color-picker');
-      picker.querySelectorAll('.bundle-color').forEach(d => d.classList.remove('bundle-color-active'));
-      dot.classList.add('bundle-color-active');
-    });
-  });
-
   // Bundle card click → detail page
   document.querySelectorAll('.bundle-card').forEach(card => {
     card.addEventListener('click', (e) => {
@@ -555,10 +527,8 @@ function initBundles() {
       const bundleKey = btn.dataset.bundle;
       const bundle = BUNDLES[bundleKey];
       if (!bundle) return;
-      const card = btn.closest('.bundle-card');
-      const colorDot = card.querySelector('.bundle-color-active');
-      const color = colorDot ? colorDot.dataset.color : 'silver';
-      addBundleToCart(bundleKey, color);
+      const randomColor = Math.random() < 0.5 ? 'silver' : 'black';
+      addBundleToCart(bundleKey, randomColor);
     });
   });
 }
@@ -581,21 +551,15 @@ function showBundleDetail(slug) {
         <div class="detail-category" style="color:var(--teal)">Bundle Pack &mdash; ${b.count} Devices</div>
         <h1 class="detail-name">${b.name}</h1>
         <div class="detail-price-wrap">
-          <span class="price-original">AUD $${b.originalPrice.toFixed(2)}</span>
-          <span class="price price-sale">AUD $${b.price.toFixed(2)}</span>
+          <span class="price-original">$${b.originalPrice.toFixed(2)}</span>
+          <span class="price price-sale">$${b.price.toFixed(2)}</span>
           <span class="card-discount-badge" style="position:static;display:inline-block;transform:none;border-radius:6px;margin-left:8px;padding:4px 10px">${pctOff}% OFF</span>
         </div>
         <div class="detail-desc">
           <p><strong>Included flavors:</strong></p>
           <p>${b.flavors.join(' &middot; ')}</p>
         </div>
-        <div class="detail-variants" style="margin:20px 0">
-          <label class="variant-label">Device Color</label>
-          <div class="variant-options" id="bundleColorOptions">
-            <button class="variant-btn variant-btn-active" data-color="silver">Silver</button>
-            <button class="variant-btn" data-color="black">Black</button>
-          </div>
-        </div>
+        <p class="color-random-note" style="margin:16px 0">Available in Silver &amp; Black — color is selected at random with each order.</p>
         <div class="detail-actions">
           <button class="btn btn-primary btn-add-to-cart" id="bundleDetailAddBtn" data-bundle="${key}">
             Add Bundle to Cart
@@ -606,26 +570,17 @@ function showBundleDetail(slug) {
           <div class="spec-row"><span class="spec-label">Puffs (per device)</span><span class="spec-val">Up to 9,000</span></div>
           <div class="spec-row"><span class="spec-label">Battery</span><span class="spec-val">2550mAh (Non-rechargeable)</span></div>
           <div class="spec-row"><span class="spec-label">Display</span><span class="spec-val">Eliquid & Battery Level</span></div>
-          <div class="spec-row"><span class="spec-label">Shipping</span><span class="spec-val">Free AU-Wide</span></div>
+          <div class="spec-row"><span class="spec-label">Shipping</span><span class="spec-val">Free Worldwide</span></div>
         </div>
       </div>
     </div>`;
 
-  // Color variant buttons
-  detail.querySelectorAll('.variant-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      detail.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('variant-btn-active'));
-      btn.classList.add('variant-btn-active');
-    });
-  });
-
-  // Add to cart
+  // Add to cart — color is random
   const addBtn = document.getElementById('bundleDetailAddBtn');
   if (addBtn) {
     addBtn.addEventListener('click', () => {
-      const activeColor = detail.querySelector('.variant-btn-active');
-      const color = activeColor ? activeColor.dataset.color : 'silver';
-      addBundleToCart(key, color);
+      const randomColor = Math.random() < 0.5 ? 'silver' : 'black';
+      addBundleToCart(key, randomColor);
     });
   }
 
