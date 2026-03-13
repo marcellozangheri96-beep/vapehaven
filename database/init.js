@@ -12,7 +12,15 @@ let dbReady = null;
  * Initialize SQLite database with required tables
  */
 async function initializeDatabase() {
-  const SQL = await initSqlJs();
+  const SQL = await initSqlJs({
+    // On Vercel, explicitly locate the WASM file from the sql.js package
+    locateFile: file => {
+      if (process.env.VERCEL) {
+        return `https://sql.js.org/dist/${file}`;
+      }
+      return file;
+    }
+  });
 
   // Load existing database or create new
   if (fs.existsSync(DB_PATH)) {
