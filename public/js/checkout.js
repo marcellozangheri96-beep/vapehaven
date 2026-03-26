@@ -3,12 +3,36 @@ const Checkout = (function() {
   let cartItems = [];
   let cartToken = null;
   let shippingData = {};
+  let paymentInfo = null; // PlazPay payment channel info
+  let pendingOrder = null; // Stores order data after creation, before PayPal redirect
 
   function init(items, token) {
     cartItems = items || window.Cart.getItems();
     cartToken = token || window.Cart.getToken();
     currentStep = 1;
+    pendingOrder = null;
+
+    // Check if returning from PayPal payment
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('plazpay_return') === 'true') {
+      handlePayPalReturn(params);
+      return;
+    }
+
+    // Preload PlazPay payment info
+    loadPaymentInfo();
     render();
+  }
+
+  async function loadPaymentInfo() {
+    try {
+      const result = await window.VH.api('/payments/payment-info');
+      if (result.success) {
+        paymentInfo = result.payment;
+      }
+    } catch (error) {
+      console.error('Failed to load payment info:', error);
+    }
   }
 
   function render() {
@@ -20,11 +44,10 @@ const Checkout = (function() {
       <div class="checkout-layout">
         <div class="checkout-main">
           ${currentStep === 1 ? renderShippingForm() : ''}
-          ${currentStep === 2 ? renderPaymentForm() : ''}
-          ${currentStep === 3 ? renderReviewStep() : ''}
-          ${currentStep === 4 ? renderConfirmation() : ''}
+          ${currentStep === 2 ? renderReviewStep() : ''}
+          ${currentStep === 3 ? renderConfirmation() : ''}
         </div>
-        ${currentStep < 4 ? renderOrderSummary() : ''}
+        ${currentStep < 3 ? renderOrderSummary() : ''}
       </div>
     `;
 
@@ -33,10 +56,7 @@ const Checkout = (function() {
   }
 
   function renderStepIndicator() {
-    // 4 steps: Shipping, Payment, Review, Confirmation
-    // Show numbered circles with labels, connected by lines
-    // Active step highlighted in teal, completed steps get checkmark
-    const steps = ['Shipping', 'Payment', 'Review', 'Confirmation'];
+    const steps = ['Shipping', 'Review & Pay', 'Confirmation'];
     return `<div class="checkout-steps">
       ${steps.map((s, i) => `
         <div class="checkout-step ${i + 1 < currentStep ? 'completed' : ''} ${i + 1 === currentStep ? 'active' : ''}">
@@ -49,11 +69,6 @@ const Checkout = (function() {
   }
 
   function renderShippingForm() {
-    // Shipping info form with: email, first_name, last_name, address_line1, address_line2, city, state, postal_code, country (default AU), phone
-    // Use form-group/form-input classes
-    // Pre-fill from shippingData if going back
-    // "Continue to Payment" button
-    // "Back to Cart" link
     return `<div class="checkout-step-content">
       <h2>Shipping Information</h2>
       <p class="checkout-step-desc">Where should we send your order?</p>
@@ -113,69 +128,21 @@ const Checkout = (function() {
         <input type="hidden" name="country" value="AU">
         <div class="checkout-nav">
           <button type="button" class="btn btn-ghost checkout-back-btn" onclick="window.Cart.openDrawer(); window.VH.goHome();">Back to Cart</button>
-          <button type="submit" class="btn btn-primary">Continue to Payment</button>
-        </div>
-      </form>
-    </div>`;
-  }
-
-  function renderPaymentForm() {
-    // Payment form: card_number, card_expiry, card_cvv
-    // Show security badges (lock, shield icons)
-    // Show accepted card logos
-    // Note: "Payments processed securely via NMI Gateway"
-    return `<div class="checkout-step-content">
-      <h2>Payment Details</h2>
-      <p class="checkout-step-desc">All transactions are secure and encrypted</p>
-      <div class="payment-security">
-        <span data-icon="shield" data-icon-size="18"></span>
-        <span>Secured by NMI Gateway</span>
-      </div>
-      <form id="paymentForm" class="checkout-form">
-        <div class="form-group">
-          <label class="form-label">Card Number</label>
-          <div class="card-input-wrap">
-            <span class="card-input-icon" data-icon="creditCard" data-icon-size="18"></span>
-            <input type="text" class="form-input card-number-input" name="card_number" placeholder="4111 1111 1111 1111" maxlength="19" required autocomplete="cc-number">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Expiry Date</label>
-            <input type="text" class="form-input" name="card_expiry" placeholder="MM/YY" maxlength="5" required autocomplete="cc-exp">
-          </div>
-          <div class="form-group">
-            <label class="form-label">CVV</label>
-            <div class="card-input-wrap">
-              <span class="card-input-icon" data-icon="lock" data-icon-size="16"></span>
-              <input type="text" class="form-input" name="card_cvv" placeholder="123" maxlength="4" required autocomplete="cc-csc">
-            </div>
-          </div>
-        </div>
-        <div class="payment-badges">
-          <div class="payment-badge"><span data-icon="lock" data-icon-size="14"></span> SSL Encrypted</div>
-          <div class="payment-badge"><span data-icon="shield" data-icon-size="14"></span> PCI Compliant</div>
-          <div class="payment-badge"><span data-icon="checkCircle" data-icon-size="14"></span> Secure Checkout</div>
-        </div>
-        <div class="checkout-nav">
-          <button type="button" class="btn btn-ghost checkout-back-btn" data-step="1">Back to Shipping</button>
-          <button type="submit" class="btn btn-primary">Review Order</button>
+          <button type="submit" class="btn btn-primary">Continue to Review</button>
         </div>
       </form>
     </div>`;
   }
 
   function renderReviewStep() {
-    // Show order summary, shipping address, items, totals
-    // "Place Order" button
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     let itemsHtml = cartItems.map(item => {
-      const imgSrc = item.variant === 'silver' && item.image_silver ? item.image_silver : item.image_black || item.image_silver;
+      const imgSrc = item.image;
       return `<div class="review-item">
         <img src="${imgSrc}" alt="${item.name}">
         <div class="review-item-info">
           <div class="review-item-name">${item.name}</div>
-          <div class="review-item-variant">${item.variant} × ${item.quantity}</div>
+          <div class="review-item-variant">× ${item.quantity}</div>
         </div>
         <div class="review-item-price">$${(item.price * item.quantity).toFixed(2)}</div>
       </div>`;
@@ -183,7 +150,7 @@ const Checkout = (function() {
 
     return `<div class="checkout-step-content">
       <h2>Review Your Order</h2>
-      <p class="checkout-step-desc">Please confirm everything looks good</p>
+      <p class="checkout-step-desc">Please confirm everything looks good, then pay with PayPal</p>
 
       <div class="review-section">
         <div class="review-section-header">
@@ -209,17 +176,31 @@ const Checkout = (function() {
         <div class="review-total-row review-total-final"><span>Total</span><span>$${subtotal.toFixed(2)}</span></div>
       </div>
 
+      <div class="payment-section">
+        <div class="payment-security">
+          <span data-icon="shield" data-icon-size="18"></span>
+          <span>Secure payment via PayPal</span>
+        </div>
+        <div class="payment-badges">
+          <div class="payment-badge"><span data-icon="lock" data-icon-size="14"></span> SSL Encrypted</div>
+          <div class="payment-badge"><span data-icon="shield" data-icon-size="14"></span> Buyer Protection</div>
+          <div class="payment-badge"><span data-icon="checkCircle" data-icon-size="14"></span> Secure Checkout</div>
+        </div>
+      </div>
+
       <div class="checkout-nav">
-        <button type="button" class="btn btn-ghost checkout-back-btn" data-step="2">Back to Payment</button>
-        <button type="button" class="btn btn-primary" id="placeOrderBtn">
-          <span data-icon="lock" data-icon-size="16"></span> Place Order — $${subtotal.toFixed(2)}
+        <button type="button" class="btn btn-ghost checkout-back-btn" data-step="1">Back to Shipping</button>
+        <button type="button" class="btn btn-primary btn-paypal" id="placeOrderBtn">
+          <svg class="paypal-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c1.652 4.142-1.024 7.26-5.882 7.26h-2.19c-1.049 0-1.937.764-2.1 1.8l-1.12 7.106a.641.641 0 0 0 .633.74h3.472c.524 0 .968-.382 1.05-.9l.86-5.452c.082-.518.526-.9 1.05-.9h.663c4.298 0 7.664-1.747 8.647-6.797.364-1.87.144-3.397-.476-4.316z"/>
+          </svg>
+          Pay with PayPal — $${subtotal.toFixed(2)}
         </button>
       </div>
     </div>`;
   }
 
   function renderConfirmation() {
-    // This gets replaced with actual order data after API call
     return `<div class="checkout-step-content checkout-confirmation">
       <div class="confirmation-icon">
         <span data-icon="checkCircle" data-icon-size="64"></span>
@@ -234,7 +215,6 @@ const Checkout = (function() {
   }
 
   function renderOrderSummary() {
-    // Sticky sidebar summary shown during steps 1-3
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -242,7 +222,7 @@ const Checkout = (function() {
       <h3>Order Summary</h3>
       <div class="checkout-summary-items">
         ${cartItems.map(item => {
-          const imgSrc = item.variant === 'silver' && item.image_silver ? item.image_silver : item.image_black || item.image_silver;
+          const imgSrc = item.image;
           return `<div class="summary-item">
             <div class="summary-item-img"><img src="${imgSrc}" alt="${item.name}"><span class="summary-item-qty">${item.quantity}</span></div>
             <div class="summary-item-name">${item.name}<br><small>${item.variant}</small></div>
@@ -261,7 +241,6 @@ const Checkout = (function() {
   // ===== Form Validation =====
   function validateShippingForm(data) {
     const errors = [];
-
     if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       errors.push('Please enter a valid email address');
     }
@@ -286,53 +265,10 @@ const Checkout = (function() {
     if (data.postal_code && !/^\d{4}$/.test(data.postal_code)) {
       errors.push('Postal code must be 4 digits');
     }
-
     return errors;
   }
 
-  function validatePaymentForm(data) {
-    const errors = [];
-
-    const cardNumber = data.card_number.replace(/\s/g, '');
-    if (!cardNumber || !/^\d{13,19}$/.test(cardNumber)) {
-      errors.push('Please enter a valid card number');
-    }
-    if (!data.card_expiry || !/^\d{2}\/\d{2}$/.test(data.card_expiry)) {
-      errors.push('Please enter expiry date in MM/YY format');
-    } else {
-      const [month, year] = data.card_expiry.split('/');
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear() % 100;
-      const currentMonth = currentDate.getMonth() + 1;
-
-      const expYear = parseInt(year);
-      const expMonth = parseInt(month);
-
-      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
-        errors.push('Card has expired');
-      }
-    }
-    if (!data.card_cvv || !/^\d{3,4}$/.test(data.card_cvv)) {
-      errors.push('Please enter a valid CVV');
-    }
-
-    return errors;
-  }
-
-  // ===== Card Number Formatting =====
-  function formatCardNumber(value) {
-    let v = value.replace(/\D/g, '').substring(0, 16);
-    return v.replace(/(.{4})/g, '$1 ').trim();
-  }
-
-  // ===== Expiry Formatting =====
-  function formatExpiry(value) {
-    let v = value.replace(/\D/g, '').substring(0, 4);
-    if (v.length >= 2) v = v.substring(0, 2) + '/' + v.substring(2);
-    return v;
-  }
-
-  // ===== Form Handling =====
+  // ===== Event Listeners =====
   function attachEventListeners() {
     // Shipping form submit
     const shippingForm = document.getElementById('shippingForm');
@@ -354,51 +290,7 @@ const Checkout = (function() {
       });
     }
 
-    // Payment form submit
-    const paymentForm = document.getElementById('paymentForm');
-    if (paymentForm) {
-      paymentForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const formData = new FormData(paymentForm);
-        const data = Object.fromEntries(formData);
-
-        const errors = validatePaymentForm(data);
-        if (errors.length > 0) {
-          window.VH.showToast(errors[0], 'error');
-          return;
-        }
-
-        shippingData = { ...shippingData, ...data };
-        currentStep = 3;
-        render();
-      });
-
-      // Card number formatting
-      const cardInput = paymentForm.querySelector('[name="card_number"]');
-      if (cardInput) {
-        cardInput.addEventListener('input', (e) => {
-          e.target.value = formatCardNumber(e.target.value);
-        });
-      }
-
-      // Expiry formatting
-      const expiryInput = paymentForm.querySelector('[name="card_expiry"]');
-      if (expiryInput) {
-        expiryInput.addEventListener('input', (e) => {
-          e.target.value = formatExpiry(e.target.value);
-        });
-      }
-
-      // CVV - only digits
-      const cvvInput = paymentForm.querySelector('[name="card_cvv"]');
-      if (cvvInput) {
-        cvvInput.addEventListener('input', (e) => {
-          e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
-        });
-      }
-    }
-
-    // Place order button
+    // Place order / Pay with PayPal button
     const placeOrderBtn = document.getElementById('placeOrderBtn');
     if (placeOrderBtn) {
       placeOrderBtn.addEventListener('click', placeOrder);
@@ -423,10 +315,11 @@ const Checkout = (function() {
     });
   }
 
+  // ===== Place Order (Create PlazPay order + redirect to PayPal) =====
   async function placeOrder() {
     const btn = document.getElementById('placeOrderBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="btn-spinner"></span> Processing...';
+    btn.innerHTML = '<span class="btn-spinner"></span> Creating order...';
     btn.classList.add('btn-loading');
 
     try {
@@ -442,22 +335,112 @@ const Checkout = (function() {
         postal_code: shippingData.postal_code,
         country: shippingData.country || 'AU',
         phone: shippingData.phone || '',
-        card_number: shippingData.card_number.replace(/\s/g, ''),
-        card_expiry: shippingData.card_expiry,
-        card_cvv: shippingData.card_cvv
+        account_voucher: paymentInfo ? paymentInfo.accountVoucher : null
       };
 
-      const result = await window.VH.api('/payments/checkout', {
+      const result = await window.VH.api('/payments/create-order', {
         method: 'POST',
         body: JSON.stringify(payload)
       });
 
       if (result.success) {
-        // Clear cart
+        // Store pending order info for when customer returns from PayPal
+        pendingOrder = {
+          orderNumber: result.order.order_number,
+          total: result.order.total,
+          plazpayOrderId: result.plazpay.orderId,
+          channelOrderId: result.plazpay.channelOrderId
+        };
+
+        // Save to sessionStorage so we can recover after redirect
+        sessionStorage.setItem('vaperoo_pending_order', JSON.stringify(pendingOrder));
+        sessionStorage.setItem('vaperoo_shipping', JSON.stringify(shippingData));
+
+        // Redirect to PlazPay's PayPal checkout
+        if (paymentInfo && paymentInfo.sdkUrl) {
+          // The SDK URL is the PayPal checkout page hosted by PlazPay
+          // Append our order ID and return URL as query params
+          const returnUrl = encodeURIComponent(window.location.origin + '/?plazpay_return=true');
+          const sdkUrl = `${paymentInfo.sdkUrl}?orderId=${pendingOrder.plazpayOrderId}&returnUrl=${returnUrl}`;
+
+          window.VH.showToast('Redirecting to PayPal...', 'info');
+
+          setTimeout(() => {
+            window.location.href = sdkUrl;
+          }, 500);
+        } else {
+          // Fallback: if no SDK URL, try to capture immediately (for testing)
+          await captureAndConfirm();
+        }
+      } else {
+        throw new Error(result.error || 'Failed to create order');
+      }
+    } catch (error) {
+      window.VH.showToast(error.message || 'Failed to process order. Please try again.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = `<svg class="paypal-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c1.652 4.142-1.024 7.26-5.882 7.26h-2.19c-1.049 0-1.937.764-2.1 1.8l-1.12 7.106a.641.641 0 0 0 .633.74h3.472c.524 0 .968-.382 1.05-.9l.86-5.452c.082-.518.526-.9 1.05-.9h.663c4.298 0 7.664-1.747 8.647-6.797.364-1.87.144-3.397-.476-4.316z"/></svg> Pay with PayPal`;
+      btn.classList.remove('btn-loading');
+      if (window.injectIcons) window.injectIcons();
+    }
+  }
+
+  // ===== Handle return from PayPal =====
+  async function handlePayPalReturn(params) {
+    // Recover pending order from sessionStorage
+    const savedOrder = sessionStorage.getItem('vaperoo_pending_order');
+    const savedShipping = sessionStorage.getItem('vaperoo_shipping');
+
+    if (savedOrder) {
+      pendingOrder = JSON.parse(savedOrder);
+    }
+    if (savedShipping) {
+      shippingData = JSON.parse(savedShipping);
+    }
+
+    if (!pendingOrder) {
+      window.VH.showToast('Order information not found', 'error');
+      window.VH.goHome();
+      return;
+    }
+
+    // Clean up URL (remove query params)
+    window.history.replaceState({}, '', window.location.pathname);
+
+    // Show a loading state
+    const container = document.getElementById('checkoutContent');
+    if (container) {
+      container.innerHTML = `
+        <div class="checkout-step-content checkout-confirmation" style="text-align:center;padding:60px 20px">
+          <div class="btn-spinner" style="width:48px;height:48px;margin:0 auto 24px"></div>
+          <h2>Completing your payment...</h2>
+          <p class="checkout-step-desc">Please wait while we confirm your order</p>
+        </div>
+      `;
+    }
+
+    // Capture the order
+    await captureAndConfirm();
+  }
+
+  // ===== Capture order and show confirmation =====
+  async function captureAndConfirm() {
+    try {
+      const captureResult = await window.VH.api('/payments/capture-order', {
+        method: 'POST',
+        body: JSON.stringify({
+          plazpay_order_id: pendingOrder.plazpayOrderId,
+          order_number: pendingOrder.orderNumber
+        })
+      });
+
+      if (captureResult.success) {
+        // Clear cart and session data
         localStorage.removeItem('vh_cart_token');
+        sessionStorage.removeItem('vaperoo_pending_order');
+        sessionStorage.removeItem('vaperoo_shipping');
 
         // Show confirmation
-        currentStep = 4;
+        currentStep = 3;
         render();
 
         // Fill in order details
@@ -466,19 +449,23 @@ const Checkout = (function() {
           details.innerHTML = `
             <div class="confirmation-order-number">
               <span class="conf-label">Order Number</span>
-              <span class="conf-value">${result.order.order_number}</span>
+              <span class="conf-value">${pendingOrder.orderNumber}</span>
             </div>
             <div class="confirmation-row">
               <span>Total Charged</span>
-              <span>$${result.order.total.toFixed(2)}</span>
+              <span>$${pendingOrder.total.toFixed(2)}</span>
             </div>
             <div class="confirmation-row">
               <span>Confirmation sent to</span>
-              <span>${shippingData.email}</span>
+              <span>${shippingData.email || ''}</span>
             </div>
             <div class="confirmation-row">
               <span>Shipping to</span>
-              <span>${shippingData.city}, ${shippingData.state} ${shippingData.postal_code}</span>
+              <span>${shippingData.city || ''}, ${shippingData.state || ''} ${shippingData.postal_code || ''}</span>
+            </div>
+            <div class="confirmation-row">
+              <span>Payment Method</span>
+              <span>PayPal</span>
             </div>
             <p class="confirmation-note">You will receive an email confirmation shortly with your order details and tracking information.</p>
           `;
@@ -486,14 +473,24 @@ const Checkout = (function() {
 
         window.VH.showToast('Order placed successfully!', 'success');
       } else {
-        throw new Error(result.error || 'Payment failed');
+        throw new Error(captureResult.error || 'Payment capture failed');
       }
     } catch (error) {
-      window.VH.showToast(error.message || 'Payment failed. Please try again.', 'error');
-      btn.disabled = false;
-      btn.innerHTML = '<span data-icon="lock" data-icon-size="16"></span> Place Order';
-      btn.classList.remove('btn-loading');
-      if (window.injectIcons) window.injectIcons();
+      window.VH.showToast(error.message || 'Payment confirmation failed. Please contact support.', 'error');
+
+      // Show error state
+      const container = document.getElementById('checkoutContent');
+      if (container) {
+        container.innerHTML = `
+          <div class="checkout-step-content checkout-confirmation" style="text-align:center;padding:60px 20px">
+            <div style="font-size:64px;margin-bottom:16px">⚠️</div>
+            <h2>Payment Issue</h2>
+            <p class="checkout-step-desc">There was a problem confirming your payment. Your order number is <strong>${pendingOrder ? pendingOrder.orderNumber : 'N/A'}</strong>.</p>
+            <p class="confirmation-note">Please contact our support team with your order number and we'll resolve this for you.</p>
+            <button type="button" class="btn btn-primary" onclick="window.VH.goHome()" style="margin-top:24px">Return Home</button>
+          </div>
+        `;
+      }
     }
   }
 

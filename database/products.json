@@ -6,8 +6,7 @@
     "price": 45.0,
     "category": "fruity",
     "color": "#e85d75",
-    "image_silver": "/images/apple-pear-watermelon-silver.jpg",
-    "image_black": "/images/apple-pear-watermelon-black.jpg",
+    "image": "/images/apple-pear-watermelon.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -18,8 +17,7 @@
     "price": 45.0,
     "category": "sweet",
     "color": "#f0c94b",
-    "image_silver": "/images/banana-smoothie-silver.jpg",
-    "image_black": "/images/banana-smoothie-black.jpg",
+    "image": "/images/banana-smoothie.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -30,8 +28,7 @@
     "price": 45.0,
     "category": "fruity",
     "color": "#9b2d5e",
-    "image_silver": "/images/black-cherry-pomegranate-silver.jpg",
-    "image_black": "/images/black-cherry-pomegranate-black.jpg",
+    "image": "/images/black-cherry-pomegranate.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -42,8 +39,7 @@
     "price": 45.0,
     "category": "sweet",
     "color": "#5c2d3e",
-    "image_silver": null,
-    "image_black": "/images/black-forest-black.jpg",
+    "image": "/images/black-forest.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -54,8 +50,7 @@
     "price": 45.0,
     "category": "fruity",
     "color": "#4a7df0",
-    "image_silver": "/images/blueberry-blast-silver.jpg",
-    "image_black": "/images/blueberry-blast-black.jpg",
+    "image": "/images/blueberry-blast.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -66,8 +61,7 @@
     "price": 45.0,
     "category": "sweet",
     "color": "#7b6cf0",
-    "image_silver": "/images/blueberry-bubblegum-silver.jpg",
-    "image_black": "/images/blueberry-bubblegum-black.jpg",
+    "image": "/images/blueberry-bubblegum.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -78,8 +72,7 @@
     "price": 45.0,
     "category": "fruity",
     "color": "#d64545",
-    "image_silver": "/images/cherry-pomegranate-silver.jpg",
-    "image_black": "/images/cherry-pomegranate-black.jpg",
+    "image": "/images/cherry-pomegranate.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -90,8 +83,7 @@
     "price": 45.0,
     "category": "sweet",
     "color": "#a855f7",
-    "image_silver": "/images/chupa-chups-grape-silver.jpg",
-    "image_black": "/images/chupa-chups-grape-black.jpg",
+    "image": "/images/chupa-chups-grape.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -104,8 +96,7 @@
     "is_top_seller": true,
     "category": "exotic",
     "color": "#3dba7a",
-    "image_silver": "/images/cumber-grape-cactus-silver.jpg",
-    "image_black": "/images/cumber-grape-cactus-black.jpg",
+    "image": "/images/cumber-grape-cactus.webp",
     "stock": 100
   },
   {
@@ -115,8 +106,7 @@
     "price": 45.0,
     "category": "fruity",
     "color": "#56c76e",
-    "image_silver": "/images/kiwi-mulberry-silver.jpg",
-    "image_black": "/images/kiwi-mulberry-black.jpg",
+    "image": "/images/kiwi-mulberry.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -127,8 +117,7 @@
     "price": 45.0,
     "category": "sweet",
     "color": "#e8a83e",
-    "image_silver": "/images/lemon-cola-silver.jpg",
-    "image_black": "/images/lemon-cola-black.jpg",
+    "image": "/images/lemon-cola.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -139,8 +128,7 @@
     "price": 45.0,
     "category": "tropical",
     "color": "#f09c4b",
-    "image_silver": "/images/mango-lime-silver.jpg",
-    "image_black": "/images/mango-lime-black.jpg",
+    "image": "/images/mango-lime.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -151,8 +139,7 @@
     "price": 45.0,
     "category": "tropical",
     "color": "#f07a5c",
-    "image_silver": "/images/mango-peach-watermelon-silver.jpg",
-    "image_black": "/images/mango-peach-watermelon-black.jpg",
+    "image": "/images/mango-peach-watermelon.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -165,8 +152,7 @@
     "is_top_seller": true,
     "category": "menthol",
     "color": "#22c9a0",
-    "image_silver": "/images/miami-mint-silver.jpg",
-    "image_black": "/images/miami-mint-black.jpg",
+    "image": "/images/miami-mint.webp",
     "stock": 100
   },
   {
@@ -176,8 +162,7 @@
     "price": 45.0,
     "category": "sweet",
     "color": "#e84393",
-    "image_silver": "/images/skittles-silver.jpg",
-    "image_black": "/images/skittles-black.jpg",
+    "image": "/images/skittles.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -188,8 +173,7 @@
     "price": 45.0,
     "category": "sweet",
     "color": "#f05068",
-    "image_silver": "/images/strawberry-candy-silver.jpg",
-    "image_black": "/images/strawberry-candy-black.jpg",
+    "image": "/images/strawberry-candy.webp",
     "stock": 100,
     "original_price": 69.0
   },
@@ -202,8 +186,7 @@
     "is_top_seller": true,
     "category": "fruity",
     "color": "#ff6b81",
-    "image_silver": "/images/strawberry-watermelon-silver.jpg",
-    "image_black": "/images/strawberry-watermelon-black.jpg",
+    "image": "/images/strawberry-watermelon.webp",
     "stock": 100
   },
   {
@@ -215,8 +198,7 @@
     "is_top_seller": true,
     "category": "classic",
     "color": "#8d7356",
-    "image_silver": "/images/tobacco-silver.jpg",
-    "image_black": "/images/tobacco-black.jpg",
+    "image": "/images/tobacco.webp",
     "stock": 100
   },
   {
@@ -226,8 +208,7 @@
     "price": 45.0,
     "category": "tropical",
     "color": "#4ecf73",
-    "image_silver": "/images/watermelon-coconut-silver.jpg",
-    "image_black": "/images/watermelon-coconut-black.jpg",
+    "image": "/images/watermelon-coconut.webp",
     "stock": 100,
     "original_price": 69.0
   }

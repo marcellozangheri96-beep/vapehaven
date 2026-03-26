@@ -27,7 +27,6 @@ async function api(path, options = {}) {
 let PRODUCTS = [];
 let currentFilter = 'all';
 let currentProduct = null;
-let currentVariant = 'black';
 
 // Top seller slugs
 const TOP_SELLER_SLUGS = ['tobacco', 'miami-mint', 'cumber-grape-cactus', 'strawberry-watermelon'];
@@ -161,16 +160,8 @@ function renderGrid() {
   let html = '';
   visible.forEach((product, i) => {
     const color = categoryColors[product.category] || '#4D96FF';
-    const defaultImg = product.image_black || product.image_silver;
+    const defaultImg = product.image;
     const isTopSeller = TOP_SELLER_SLUGS.includes(product.slug) || product.is_top_seller;
-
-    let dots = '';
-    if (product.image_silver && product.image_black) {
-      dots = `<div class="card-variant-dots">
-        <span class="dot silver" title="Silver"></span>
-        <span class="dot black" title="Black"></span>
-      </div>`;
-    }
 
     // Price display — crossed-out original price for ALL products that have one
     let priceHTML;
@@ -197,7 +188,6 @@ function renderGrid() {
           <h3 class="card-name">${product.name}</h3>
           <div class="card-price-wrap">${priceHTML}</div>
           <span class="card-shipping">Free shipping</span>
-          ${dots}
         </div>
       </div>`;
   });
@@ -232,9 +222,6 @@ function goToProduct(slug) {
   currentProduct = PRODUCTS.find(p => p.slug === slug);
   if (!currentProduct) { showToast('Product not found', 'error'); return; }
 
-  if (currentProduct.image_silver && !currentProduct.image_black) currentVariant = 'silver';
-  else currentVariant = 'black';
-
   renderDetail();
   showPage('detailPage');
 }
@@ -246,20 +233,8 @@ function renderDetail() {
   const p = currentProduct;
   const color = categoryColors[p.category] || '#4D96FF';
   const catLabel = categoryLabels[p.category] || p.category;
-  const img = p.image_black || p.image_silver;
+  const img = p.image;
   const isTopSeller = TOP_SELLER_SLUGS.includes(p.slug) || p.is_top_seller;
-
-  // Show both color images side by side + random note
-  let variantHTML = '';
-  if (p.image_black && p.image_silver) {
-    variantHTML = `<div class="variant-gallery">
-      <div class="variant-gallery-imgs">
-        <img src="${p.image_silver}" alt="${p.name} — Silver" class="variant-gallery-img">
-        <img src="${p.image_black}" alt="${p.name} — Black" class="variant-gallery-img">
-      </div>
-      <p class="color-random-note">Available in Silver &amp; Black — color is selected at random with each order.</p>
-    </div>`;
-  }
 
   const specs = [
     { label: 'Puffs', value: p.puffs, icon: 'puffs' },
@@ -307,11 +282,60 @@ function renderDetail() {
             ${detailPriceHTML}
             <span class="free-shipping">Free Shipping Worldwide</span>
           </div>
-          ${variantHTML}
           ${specsHTML}
           <button class="btn btn-primary btn-add-to-cart" id="addToCartBtn">
             <span data-icon="bag" data-icon-size="18"></span> Add to Cart
           </button>
+        </div>
+      </div>
+      <div class="product-faq">
+        <h3 class="faq-title">Frequently Asked Questions</h3>
+        <div class="faq-accordion">
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>How long does the ${p.name} last?</span>
+              <span class="faq-chevron" data-icon="chevronDown" data-icon-size="16"></span>
+            </button>
+            <div class="faq-answer">
+              <p>The SWIX Mate ${p.name} delivers up to ${p.puffs || '9000'} puffs. For an average user, this is equivalent to roughly 7–10 days of regular use. The built-in LED display shows your remaining e-liquid level so you always know where you stand.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>What type of coil does it use?</span>
+              <span class="faq-chevron" data-icon="chevronDown" data-icon-size="16"></span>
+            </button>
+            <div class="faq-answer">
+              <p>The SWIX Mate uses a ${p.coil || 'mesh coil'} which provides smoother, more consistent flavor from the first puff to the last. Mesh coils heat e-liquid more evenly than traditional coils, resulting in richer taste and denser clouds.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Is shipping really free?</span>
+              <span class="faq-chevron" data-icon="chevronDown" data-icon-size="16"></span>
+            </button>
+            <div class="faq-answer">
+              <p>Yes! We offer free shipping worldwide on all orders. Standard delivery typically takes 5–10 business days depending on your location. All orders are shipped in discreet, unbranded packaging.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>What's included in the box?</span>
+              <span class="faq-chevron" data-icon="chevronDown" data-icon-size="16"></span>
+            </button>
+            <div class="faq-answer">
+              <p>Each SWIX Mate comes pre-filled and fully charged, ready to use straight out of the box. The package includes 1x SWIX Mate 9000 device in your chosen flavour. No charging, filling, or setup required — simply inhale to activate.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question" aria-expanded="false">
+              <span>Can I save money with bundle packs?</span>
+              <span class="faq-chevron" data-icon="chevronDown" data-icon-size="16"></span>
+            </button>
+            <div class="faq-answer">
+              <p>Absolutely! Our themed bundles of 5 devices save you up to 42% compared to buying individually. The Mystery Box (10 devices) saves up to 45%. Check out our <a href="#bundles" class="faq-link" onclick="goHome();setTimeout(()=>document.getElementById('bundleSection')?.scrollIntoView({behavior:'smooth'}),300)">Bundle Packs</a> section for all available options.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>`;
@@ -321,16 +345,71 @@ function renderDetail() {
 
   document.getElementById('addToCartBtn').addEventListener('click', () => {
     if (window.Cart) {
-      const randomColor = Math.random() < 0.5 ? 'silver' : 'black';
-      window.Cart.addItem(currentProduct.id, randomColor, 1);
+      window.Cart.addItem(currentProduct.id, 'default', 1);
     }
   });
 
+  // FAQ accordion toggle
+  container.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('faq-open');
+      // Close all
+      container.querySelectorAll('.faq-item').forEach(i => i.classList.remove('faq-open'));
+      container.querySelectorAll('.faq-question').forEach(b => b.setAttribute('aria-expanded', 'false'));
+      // Toggle current
+      if (!isOpen) {
+        item.classList.add('faq-open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
   if (window.injectIcons) window.injectIcons();
+
+  // Inject JSON-LD Product structured data for SEO
+  injectProductSchema(p);
+}
+
+function injectProductSchema(p) {
+  // Remove any previous product schema
+  const existing = document.getElementById('product-jsonld');
+  if (existing) existing.remove();
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": `SWIX Mate 9000 — ${p.name}`,
+    "description": p.description,
+    "image": `https://vape-roo.com${p.image}`,
+    "url": `https://vape-roo.com/#product/${p.slug}`,
+    "brand": { "@type": "Brand", "name": "SWIX Mate" },
+    "sku": p.slug,
+    "category": "Disposable Vape",
+    "offers": {
+      "@type": "Offer",
+      "url": `https://vape-roo.com/#product/${p.slug}`,
+      "priceCurrency": "AUD",
+      "price": p.price.toFixed(2),
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "Organization", "name": "Vaperoo" },
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "AUD" },
+        "shippingDestination": { "@type": "DefinedRegion", "name": "Worldwide" }
+      }
+    }
+  };
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = 'product-jsonld';
+  script.textContent = JSON.stringify(schema);
+  document.head.appendChild(script);
 }
 
 function switchVariant(variant) {
-  // Deprecated — color is now random. Kept for compatibility.
+  // Deprecated — kept for compatibility.
 }
 
 // ===== Marquees =====
@@ -485,28 +564,28 @@ const BUNDLES = {
     slug: 'tropical-paradise',
     flavors: ['Mango Lime', 'Mango Peach Watermelon', 'Watermelon Coconut', 'Kiwi Mulberry', 'Apple Pear Watermelon'],
     price: 200, originalPrice: 345, count: 5,
-    img: '/images/catalog/hero-devices.jpg'
+    img: '/images/catalog/tropical-paradise.webp'
   },
   berry: {
     name: 'Berry Blast',
     slug: 'berry-blast',
     flavors: ['Blueberry Blast', 'Blueberry Bubblegum', 'Black Cherry Pomegranate', 'Strawberry Watermelon', 'Cherry Pomegranate'],
     price: 200, originalPrice: 345, count: 5,
-    img: '/images/catalog/special-edition-device.jpg'
+    img: '/images/catalog/berry-blast.webp'
   },
   sweet: {
     name: 'Sweet Classics',
     slug: 'sweet-classics',
     flavors: ['Skittles', 'Chupa Chups Grape', 'Strawberry Candy', 'Banana Smoothie', 'Lemon Cola'],
     price: 200, originalPrice: 345, count: 5,
-    img: '/images/catalog/three-devices.jpg'
+    img: '/images/catalog/sweet-classics.webp'
   },
   mystery: {
     name: 'Mystery Box',
     slug: 'mystery-box',
     flavors: ['10 randomly selected flavors from our full range of 19'],
     price: 380, originalPrice: 690, count: 10,
-    img: '/images/catalog/global-edition.jpg'
+    img: '/images/catalog/mystery-box.webp'
   }
 };
 
@@ -527,8 +606,7 @@ function initBundles() {
       const bundleKey = btn.dataset.bundle;
       const bundle = BUNDLES[bundleKey];
       if (!bundle) return;
-      const randomColor = Math.random() < 0.5 ? 'silver' : 'black';
-      addBundleToCart(bundleKey, randomColor);
+      addBundleToCart(bundleKey);
     });
   });
 }
@@ -559,7 +637,6 @@ function showBundleDetail(slug) {
           <p><strong>Included flavors:</strong></p>
           <p>${b.flavors.join(' &middot; ')}</p>
         </div>
-        <p class="color-random-note" style="margin:16px 0">Available in Silver &amp; Black — color is selected at random with each order.</p>
         <div class="detail-actions">
           <button class="btn btn-primary btn-add-to-cart" id="bundleDetailAddBtn" data-bundle="${key}">
             Add Bundle to Cart
@@ -575,12 +652,10 @@ function showBundleDetail(slug) {
       </div>
     </div>`;
 
-  // Add to cart — color is random
   const addBtn = document.getElementById('bundleDetailAddBtn');
   if (addBtn) {
     addBtn.addEventListener('click', () => {
-      const randomColor = Math.random() < 0.5 ? 'silver' : 'black';
-      addBundleToCart(key, randomColor);
+      addBundleToCart(key);
     });
   }
 
@@ -588,7 +663,7 @@ function showBundleDetail(slug) {
   if (window.injectIcons) window.injectIcons();
 }
 
-async function addBundleToCart(bundleKey, color) {
+async function addBundleToCart(bundleKey) {
   const b = BUNDLES[bundleKey];
   if (!b) return;
 
@@ -600,7 +675,7 @@ async function addBundleToCart(bundleKey, color) {
       headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId },
       body: JSON.stringify({
         product_id: 9000 + Object.keys(BUNDLES).indexOf(bundleKey),
-        variant_id: color === 'black' ? 2 : 1,
+        variant_id: 1,
         quantity: 1,
         is_bundle: true,
         bundle_key: bundleKey,
@@ -614,9 +689,9 @@ async function addBundleToCart(bundleKey, color) {
 
   // Use cart module to show toast and update count
   if (window.Cart) {
-    window.Cart.addBundleItem(bundleKey, color, b);
+    window.Cart.addBundleItem(bundleKey, 'default', b);
   }
-  showToast(`${b.name} (${color}) added to cart!`);
+  showToast(`${b.name} added to cart!`);
 }
 
 // ===== Initialize =====
@@ -640,6 +715,5 @@ window.VH = {
   api,
   products: () => PRODUCTS,
   currentProduct: () => currentProduct,
-  currentVariant: () => currentVariant,
   bundles: () => BUNDLES
 };

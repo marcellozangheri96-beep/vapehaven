@@ -13,12 +13,12 @@ let dbReady = null;
  */
 async function initializeDatabase() {
   const SQL = await initSqlJs({
-    // On Vercel, explicitly locate the WASM file from the sql.js package
     locateFile: file => {
       if (process.env.VERCEL) {
         return `https://sql.js.org/dist/${file}`;
       }
-      return file;
+      // Locally, load the WASM from the sql.js package
+      return path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', file);
     }
   });
 
@@ -43,8 +43,7 @@ async function initializeDatabase() {
       price REAL DEFAULT 49.00,
       category TEXT,
       color TEXT,
-      image_silver TEXT,
-      image_black TEXT,
+      image TEXT,
       original_price REAL,
       is_top_seller INTEGER DEFAULT 0,
       stock INTEGER DEFAULT 100,
@@ -179,9 +178,9 @@ function seedProducts() {
     const stmt = db.prepare(`
       INSERT INTO products (
         name, slug, description, price, original_price, is_top_seller, category, color,
-        image_silver, image_black, stock,
+        image, stock,
         puffs, capacity, coil, battery, display_type, size_dims
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     for (const product of productsData) {
@@ -194,8 +193,7 @@ function seedProducts() {
         product.is_top_seller ? 1 : 0,
         product.category,
         product.color,
-        product.image_silver,
-        product.image_black,
+        product.image,
         product.stock,
         commonSpecs.puffs,
         commonSpecs.capacity,

@@ -268,13 +268,7 @@ const Cart = (function() {
     // Build items HTML
     let html = '';
     for (const item of cartItems) {
-      // Select appropriate image based on variant
-      const imgSrc = item.variant === 'silver' && item.image_silver
-        ? item.image_silver
-        : item.image_black || item.image_silver;
-
-      // Format variant display (Silver/Black)
-      const variantDisplay = item.variant.charAt(0).toUpperCase() + item.variant.slice(1);
+      const imgSrc = item.image;
 
       // Calculate item total price
       const itemTotal = (item.price * item.quantity).toFixed(2);
@@ -286,7 +280,6 @@ const Cart = (function() {
           </div>
           <div class="cart-item-info">
             <div class="cart-item-name">${item.name}</div>
-            <div class="cart-item-variant">${variantDisplay}</div>
             <div class="cart-item-bottom">
               <div class="qty-controls">
                 <button class="qty-btn qty-minus" data-item-id="${item.id}" data-action="decrease" aria-label="Decrease quantity">
@@ -309,15 +302,14 @@ const Cart = (function() {
     // Render bundle items
     for (const b of bundleItems) {
       const bTotal = (b.price * b.qty).toFixed(2);
-      const colorLabel = b.color.charAt(0).toUpperCase() + b.color.slice(1);
       html += `
-        <div class="cart-item cart-item-bundle" data-bundle-key="${b.key}" data-bundle-color="${b.color}">
+        <div class="cart-item cart-item-bundle" data-bundle-key="${b.key}">
           <div class="cart-item-img">
             <img src="${b.img}" alt="${b.name}" loading="lazy">
           </div>
           <div class="cart-item-info">
             <div class="cart-item-name">${b.name}</div>
-            <div class="cart-item-variant">${colorLabel} &middot; ${b.count} devices</div>
+            <div class="cart-item-variant">${b.count} devices</div>
             <div class="cart-item-bottom">
               <span class="cart-item-qty">Qty: ${b.qty}</span>
               <span class="cart-item-price">$${bTotal}</span>

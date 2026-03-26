@@ -120,6 +120,43 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Sitemap.xml — dynamically generated from products
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    await dbReady;
+    const { queryAll } = require('./database/init');
+    const products = queryAll('SELECT slug, name FROM products');
+    const bundles = ['tropical-paradise', 'berry-blast', 'sweet-classics', 'mystery-box'];
+    const today = new Date().toISOString().split('T')[0];
+    const base = 'https://vape-roo.com';
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    // Homepage — highest priority
+    xml += `  <url>\n    <loc>${base}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
+
+    // Product pages
+    for (const p of products) {
+      xml += `  <url>\n    <loc>${base}/#product/${p.slug}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
+    }
+
+    // Bundle pages
+    for (const slug of bundles) {
+      xml += `  <url>\n    <loc>${base}/#bundle/${slug}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+    }
+
+    xml += '</urlset>';
+
+    res.set('Content-Type', 'application/xml');
+    res.set('Cache-Control', 'public, max-age=86400'); // Cache for 24h
+    res.send(xml);
+  } catch (error) {
+    log('ERROR', 'Failed to generate sitemap', { error: error.message });
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({

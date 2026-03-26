@@ -56,8 +56,7 @@ router.get('/:token', async (req, res) => {
         p.name,
         p.slug,
         p.price,
-        p.image_silver,
-        p.image_black
+        p.image
       FROM cart_items ci
       JOIN products p ON ci.product_id = p.id
       WHERE ci.session_id = ?
