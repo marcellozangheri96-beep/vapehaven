@@ -664,31 +664,11 @@ function showBundleDetail(slug) {
   if (window.injectIcons) window.injectIcons();
 }
 
-async function addBundleToCart(bundleKey) {
+function addBundleToCart(bundleKey) {
   const b = BUNDLES[bundleKey];
   if (!b) return;
 
-  // Use the cart API — add as a special bundle item
-  try {
-    const sessionId = localStorage.getItem('vh_session');
-    const res = await api('/api/cart/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-session-id': sessionId },
-      body: JSON.stringify({
-        product_id: 9000 + Object.keys(BUNDLES).indexOf(bundleKey),
-        variant_id: 1,
-        quantity: 1,
-        is_bundle: true,
-        bundle_key: bundleKey,
-        bundle_name: b.name,
-        bundle_price: b.price
-      })
-    });
-  } catch (e) {
-    // Fallback — just add to cart via the Cart module directly
-  }
-
-  // Use cart module to show toast and update count
+  // Add to cart via the Cart module directly (client-side)
   if (window.Cart) {
     window.Cart.addBundleItem(bundleKey, 'default', b);
   }

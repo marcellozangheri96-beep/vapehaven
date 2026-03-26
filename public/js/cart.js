@@ -375,6 +375,16 @@ const Cart = (function() {
     fetchCart();
   }
 
+  // ===== Cart Count =====
+  function updateCartCount() {
+    const totalCount = cartItems.reduce((s, i) => s + i.quantity, 0) + getBundleCount();
+    const badge = document.querySelector('.cart-count');
+    if (badge) {
+      badge.textContent = totalCount;
+      badge.style.display = totalCount > 0 ? 'flex' : 'none';
+    }
+  }
+
   // ===== Bundle items (client-side storage) =====
   let bundleItems = JSON.parse(localStorage.getItem('vh_bundles') || '[]');
 
@@ -413,18 +423,7 @@ const Cart = (function() {
     return bundleItems.reduce((sum, b) => sum + b.qty, 0);
   }
 
-  // Override updateCartCount to include bundles
-  const _origUpdateCount = updateCartCount;
-  function updateCartCountWithBundles() {
-    const totalCount = cartItems.reduce((s, i) => s + i.quantity, 0) + getBundleCount();
-    const badge = document.querySelector('.cart-count');
-    if (badge) {
-      badge.textContent = totalCount;
-      badge.style.display = totalCount > 0 ? 'flex' : 'none';
-    }
-  }
-  // Replace the original
-  updateCartCount = updateCartCountWithBundles;
+  // updateCartCount is defined above and already includes bundle count
 
   // Public API
   return {
