@@ -88,8 +88,9 @@ function goHome() {
 
 async function loadProducts() {
   try {
-    const res = await api('/products');
-    PRODUCTS = res.data || res;
+    const res = await fetch('/data/products.json');
+    if (!res.ok) throw new Error(`Failed to load products: ${res.status}`);
+    PRODUCTS = await res.json();
     renderFilterBar();
     renderGrid();
     initMarquee();
@@ -280,7 +281,7 @@ function renderDetail() {
           <p class="detail-description">${p.description}</p>
           <div class="detail-price">
             ${detailPriceHTML}
-            <span class="free-shipping">Free Shipping Worldwide</span>
+            <span class="free-shipping">Free Shipping Australia</span>
           </div>
           ${specsHTML}
           <button class="btn btn-primary btn-add-to-cart" id="addToCartBtn">
@@ -315,7 +316,7 @@ function renderDetail() {
               <span class="faq-chevron" data-icon="chevronDown" data-icon-size="16"></span>
             </button>
             <div class="faq-answer">
-              <p>Yes! We offer free shipping worldwide on all orders. Standard delivery typically takes 5–10 business days depending on your location. All orders are shipped in discreet, unbranded packaging.</p>
+              <p>Yes! We offer free shipping across Australia on all orders. Standard delivery typically takes 3–7 business days depending on your location. All orders are shipped in discreet, unbranded packaging.</p>
             </div>
           </div>
           <div class="faq-item">
@@ -396,7 +397,7 @@ function injectProductSchema(p) {
       "shippingDetails": {
         "@type": "OfferShippingDetails",
         "shippingRate": { "@type": "MonetaryAmount", "value": "0", "currency": "AUD" },
-        "shippingDestination": { "@type": "DefinedRegion", "name": "Worldwide" }
+        "shippingDestination": { "@type": "DefinedRegion", "addressCountry": "AU", "name": "Australia" }
       }
     }
   };
@@ -423,7 +424,7 @@ function initMarquee() {
 
   const shipMarquee = document.getElementById('shipMarquee');
   if (shipMarquee) {
-    const text = 'FREE SHIPPING WORLDWIDE \u2022 PREMIUM QUALITY \u2022 9000 PUFFS \u2022';
+    const text = 'FREE SHIPPING AUSTRALIA \u2022 PREMIUM QUALITY \u2022 9000 PUFFS \u2022';
     shipMarquee.innerHTML = `<div class="shipping-marquee-content"><span>${text}</span><span>${text}</span><span>${text}</span></div>`;
   }
 }
@@ -647,7 +648,7 @@ function showBundleDetail(slug) {
           <div class="spec-row"><span class="spec-label">Puffs (per device)</span><span class="spec-val">Up to 9,000</span></div>
           <div class="spec-row"><span class="spec-label">Battery</span><span class="spec-val">2550mAh (Non-rechargeable)</span></div>
           <div class="spec-row"><span class="spec-label">Display</span><span class="spec-val">Eliquid & Battery Level</span></div>
-          <div class="spec-row"><span class="spec-label">Shipping</span><span class="spec-val">Free Worldwide</span></div>
+          <div class="spec-row"><span class="spec-label">Shipping</span><span class="spec-val">Free Australia-wide</span></div>
         </div>
       </div>
     </div>`;

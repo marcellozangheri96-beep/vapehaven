@@ -136,6 +136,9 @@ app.get('/sitemap.xml', async (req, res) => {
     // Homepage — highest priority
     xml += `  <url>\n    <loc>${base}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
 
+    // Blog page
+    xml += `  <url>\n    <loc>${base}/blog.html</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
+
     // Product pages
     for (const p of products) {
       xml += `  <url>\n    <loc>${base}/#product/${p.slug}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
