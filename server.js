@@ -136,8 +136,19 @@ app.get('/sitemap.xml', async (req, res) => {
     // Homepage — highest priority
     xml += `  <url>\n    <loc>${base}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n`;
 
-    // Blog page
+    // Blog hub
     xml += `  <url>\n    <loc>${base}/blog.html</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.9</priority>\n  </url>\n`;
+
+    // Blog articles
+    const blogArticles = [
+      'best-disposable-vapes-australia',
+      'swix-mate-9000-review',
+      'top-vape-flavors-australia',
+      'how-to-use-swix-mate'
+    ];
+    for (const slug of blogArticles) {
+      xml += `  <url>\n    <loc>${base}/blog/${slug}.html</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.85</priority>\n  </url>\n`;
+    }
 
     // Product pages
     for (const p of products) {
