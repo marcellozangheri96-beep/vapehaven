@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { queryAll, queryOne, runSql, dbReady } = require('../database/init');
 const plazpay = require('../services/plazpayGateway');
+const { sendOrderNotification, sendCustomerConfirmation } = require('../services/emailNotifier');
 
 /**
  * Generate unique order number
@@ -231,11 +232,30 @@ router.post('/capture-order', async (req, res) => {
         WHERE order_number = ? AND nmi_transaction_id = ?
       `, [order_number, plazpay_order_id]);
 
-      // Clear the cart
-      const order = queryOne('SELECT id, email, total FROM orders WHERE order_number = ?', [order_number]);
+      // Fetch full order details for emails
+      const order = queryOne(`
+        SELECT id, order_number, email, first_name, last_name,
+               address_line1, address_line2, city, state, postal_code, country, phone, total
+        FROM orders WHERE order_number = ?
+      `, [order_number]);
 
-      // Find and clear the cart by looking at the most recent cart session
-      // (In production you'd associate cart_token with the order)
+      // Fetch order items
+      const orderItems = order ? queryAll(`
+        SELECT oi.quantity, oi.unit_price as price, p.name
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+      `, [order.id]) : [];
+
+      // Send email notifications (fire-and-forget — don't block the response)
+      if (order) {
+        sendOrderNotification(order, orderItems).catch(e =>
+          console.error('Owner notification failed:', e.message)
+        );
+        sendCustomerConfirmation(order, orderItems).catch(e =>
+          console.error('Customer confirmation failed:', e.message)
+        );
+      }
 
       res.json({
         success: true,
